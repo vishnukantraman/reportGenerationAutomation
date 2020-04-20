@@ -17,5 +17,6 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.12.3",
   "com.nrinaudo" %% "kantan.csv" % "0.6.0",
   "com.nrinaudo" %% "kantan.csv-generic" % "0.6.0",
-  "com.github.blemale" %% "scaffeine" % "4.0.0"
+  "com.github.blemale" %% "scaffeine" % "4.0.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.5.25"
 )
