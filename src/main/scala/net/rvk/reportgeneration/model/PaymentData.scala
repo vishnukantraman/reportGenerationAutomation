@@ -2,7 +2,7 @@ package net.rvk.reportgeneration.model
 
 case class AllPaymentsData(status: Int, data: List[BillingRecords], count: Int, dashboardCounts: DashboardCounts)
 case class DashboardCounts(totalPayments: Int, todayPayments: Int, thisweekPayments: Int, thismonthPayments: Int)
-case class PaymentDetails(id: Int, item: String, itemId:Option[Int], tax: Option[Int], cost: Int, qty: Int, total_amount: Int, service_type: String)
+case class PaymentDetails(id: Int, item: String, itemId:Option[Int], tax: Option[Float], cost: Int, qty: Int, total_amount: Int, service_type: String)
 case class BillingRecords(id: Int,
                           customerUniqueCode: String,
                           firstName: String,
@@ -46,7 +46,7 @@ case class PaymentDataFlatFileStructure(id: Int,
                                         paymentDetailId: Int,
                                         item: String,
                                         itemId:Option[Int],
-                                        tax: Option[Int],
+                                        tax: Option[Float],
                                         cost: Int,
                                         qty: Int,
                                         itemTotalAmount: Int,

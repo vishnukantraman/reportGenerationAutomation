@@ -18,5 +18,6 @@ libraryDependencies ++= Seq(
   "com.nrinaudo" %% "kantan.csv" % "0.6.0",
   "com.nrinaudo" %% "kantan.csv-generic" % "0.6.0",
   "com.github.blemale" %% "scaffeine" % "4.0.0",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.5.25"
+  "com.typesafe.akka" %% "akka-slf4j" % "2.5.25",
+  "ch.qos.logback" % "logback-classic" % "1.2.3"
 )
