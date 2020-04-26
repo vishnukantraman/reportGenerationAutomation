@@ -28,7 +28,7 @@ import scala.util.{Failure, Success}
 
 object AkkaHttp {
   def main(args: Array[String]): Unit = {
-
+    val logger = LoggerFactory.getLogger(getClass)
     class UnauthorizedException(message:String) extends RuntimeException(message)
     class MissingFormData(message:String) extends RuntimeException(message)
     class ServerSideError(message: String) extends RuntimeException(message)
@@ -43,7 +43,6 @@ object AkkaHttp {
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-    val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()
     val dbname = config.getString("rr.project.dbname")
     val driver = AsyncDriver()
