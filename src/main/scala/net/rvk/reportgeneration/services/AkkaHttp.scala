@@ -171,6 +171,11 @@ object AkkaHttp {
     }
 
     val route: Route =
+      getFromResourceDirectory("") ~ pathPrefix("") {
+        get {
+          getFromResource("index.html")
+        }
+      } ~
       path("getPaymentDetails") {
         concat(
           get {

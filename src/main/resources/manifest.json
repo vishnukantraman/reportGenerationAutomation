@@ -1,0 +1,10 @@
+{
+  "short_name": "Report Generation",
+  "name": "Interface for generating CSV Report",
+  "icons": [
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
