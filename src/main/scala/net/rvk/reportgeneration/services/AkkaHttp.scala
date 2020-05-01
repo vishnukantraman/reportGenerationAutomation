@@ -49,7 +49,7 @@ object AkkaHttp {
     val mongoUri = s"mongodb://localhost:27017/db"
     val parsedURI = Future.fromTry(MongoConnection.parseURI(mongoUri))
     val futureConnection = parsedURI.flatMap(driver.connect(_))
-    val failoverStrategy = FailoverStrategy (initialDelay = 150.milliseconds, retries = 10, delayFactor = attemptNumber => 2 + attemptNumber * 0.5)
+    val failoverStrategy = FailoverStrategy (initialDelay = 3.seconds, retries = 10, delayFactor = attemptNumber => 1 + attemptNumber * 0.5)
     def dbConnection: Future[DefaultDB] = futureConnection.flatMap(_.database(dbname, failoverStrategy))
     def masterDataCollection:Future[BSONCollection] = dbConnection.map(_.collection("masterData"))
     val http = Http(system)
@@ -170,11 +170,6 @@ object AkkaHttp {
     }
 
     val route: Route =
-      getFromResourceDirectory("") ~ pathPrefix("") {
-        get {
-          getFromResource("index.html")
-        }
-      } ~
       path("getPaymentDetails") {
         concat(
           get {
@@ -206,9 +201,13 @@ object AkkaHttp {
               }
             }
           })
+      }  ~ getFromResourceDirectory("Frontend") ~ pathSingleSlash {
+        get {
+          redirect("index.html", StatusCodes.PermanentRedirect)
+        }
       }
 
-    futureConnection.onComplete {
+    dbConnection.onComplete {
       case Success(_) =>
         Http().bindAndHandle(route, "localhost", 8080)
         logger.info(s"Server online at http://localhost:8080/")
