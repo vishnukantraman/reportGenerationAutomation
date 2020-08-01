@@ -1,8 +1,8 @@
 package net.rvk.reportgeneration.model
 
 case class AllPaymentsData(status: Int, data: List[BillingRecords], count: Int, dashboardCounts: DashboardCounts)
-case class DashboardCounts(totalPayments: Int, todayPayments: Int, thisweekPayments: Int, thismonthPayments: Int)
-case class PaymentDetails(id: Int, item: String, itemId:Option[Int], tax: Option[Float], cost: Int, qty: Int, total_amount: Int, service_type: String)
+case class DashboardCounts(totalPayments: BigDecimal, todayPayments: BigInt, thisweekPayments: BigDecimal, thismonthPayments: BigInt)
+case class PaymentDetails(id: Int, item: String, itemId:Option[Int], tax: Option[Float], cost: Float, qty: Int, total_amount: Float, service_type: String)
 case class BillingRecords(id: Int,
                           customerUniqueCode: String,
                           firstName: String,
@@ -21,7 +21,8 @@ case class BillingRecords(id: Int,
                           panNumber: String,
                           receiptNumber: String,
                           payment_date: String,
-                          totalAmount: Int,
+                          totalAmount: Float,
+                          notes: String,
                           paymentDetails: List[PaymentDetails])
 
 case class PaymentDataFlatFileStructure(id: Int,
@@ -42,12 +43,13 @@ case class PaymentDataFlatFileStructure(id: Int,
                                         panNumber: String,
                                         receiptNumber: String,
                                         paymentDate: String,
-                                        totalAmount: Int,
+                                        totalAmount: Float,
+                                        notes: String,
                                         paymentDetailId: Int,
                                         item: String,
                                         itemId:Option[Int],
                                         tax: Option[Float],
-                                        cost: Int,
+                                        cost: Float,
                                         qty: Int,
-                                        itemTotalAmount: Int,
+                                        itemTotalAmount: Float,
                                         serviceType: String)

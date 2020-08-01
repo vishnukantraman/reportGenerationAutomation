@@ -70,7 +70,7 @@ object AkkaHttp {
     }
 
     def convertDeepStructureToFlatStructure(billingDetails: AllPaymentsData)= {
-      billingDetails.data.flatMap(x => x.paymentDetails.map(y => PaymentDataFlatFileStructure(x.id, x.customerUniqueCode, x.firstName, x.lastName, x.customerName, x.billingUnit, x.contactNo, x.dob.toString, x.age.toString, x.address.filter(_ >= ' ').toString, x.email.toString, x.cityName.toString, x.stateName.toString, x.zipcode.toString, x.aadharNumber.toString, x.panNumber.toString, x.receiptNumber.toString, x.payment_date.toString, x.totalAmount, y.id, y.item, y.itemId, y.tax, y.cost, y.qty, y.total_amount, y.service_type.toString)))
+      billingDetails.data.flatMap(x => x.paymentDetails.map(y => PaymentDataFlatFileStructure(x.id, x.customerUniqueCode, x.firstName, x.lastName, x.customerName, x.billingUnit, x.contactNo, x.dob.toString, x.age.toString, x.address.filter(_ >= ' ').toString, x.email.toString, x.cityName.toString, x.stateName.toString, x.zipcode.toString, x.aadharNumber.toString, x.panNumber.toString, x.receiptNumber.toString, x.payment_date.toString, x.totalAmount, x.notes.toString, y.id, y.item, y.itemId, y.tax, y.cost, y.qty, y.total_amount, y.service_type.toString)))
     }
 
     def parsePaymentData(str: String) = {
@@ -166,7 +166,7 @@ object AkkaHttp {
     }
 
     def generateCSV(value: List[PaymentDataFlatFileStructure], startDate: String, endDate: String, assignedPath: String) = {
-      new File(s"${assignedPath}PaymentReport_${startDate}_to_${endDate}.csv").writeCsv(value,rfc.withHeader("id|customerUniqueCode|firstName|lastName|customerName|billingUnit|contactNo|dob|age|address|email|cityName|stateName|zipcode|aadharNumber|panNumber|receiptNumber|paymentDate|totalAmount|paymentDetailId|item|itemId|tax|cost|qty|itemTotalAmount|serviceType"))
+      new File(s"${assignedPath}PaymentReport_${startDate}_to_${endDate}.csv").writeCsv(value,rfc.withHeader("id|customerUniqueCode|firstName|lastName|customerName|billingUnit|contactNo|dob|age|address|email|cityName|stateName|zipcode|aadharNumber|panNumber|receiptNumber|paymentDate|totalAmount|notes|paymentDetailId|item|itemId|tax|cost|qty|itemTotalAmount|serviceType"))
     }
 
     val route: Route =
