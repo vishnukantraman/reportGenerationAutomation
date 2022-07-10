@@ -1,0 +1,16 @@
+version: "3.2"
+services:
+  mongodb:
+    image: mongo:4.2.12
+    ports:
+      - 27017:27017
+    volumes:
+      - C:\data\db:/data/db
+  app:
+    image: vishnukantraman/reportgernerationautomation:0.1
+    volumes:
+      - C:\Users\Downloads:/opt/docker/data/
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb

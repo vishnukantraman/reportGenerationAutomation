@@ -1,9 +1,25 @@
+import com.typesafe.sbt.packager.docker._
 name := "reportGernerationAutomation"
 
 version := "0.1"
 
 scalaVersion := "2.13.1"
+dockerBaseImage       := "openjdk:jre-alpine"
+dockerExposedPorts := Seq(8080, 27017)
+dockerExposedVolumes := Seq("/opt/docker/data")
+dockerCommands ++= Seq(
+//  ExecCmd("RUN", "mkdir", "/opt/docker/data"),
+  ExecCmd("RUN", "chmod", "u+x", "/opt/docker/data")
+)
 
+mainClass in Compile := Some("net.rvk.reportgeneration.services.AkkaHttp")
+lazy val root = (project in file(".")).
+  settings(
+    inThisBuild(List(
+      organization    := "net.rvk",
+      scalaVersion    := "2.13.1"
+    )),
+    name := "AkkaHttpServer",
 libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.3.4",
   "com.typesafe.akka" %% "akka-http" % "10.1.8",
@@ -21,3 +37,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % "2.5.25",
   "ch.qos.logback" % "logback-classic" % "1.2.3"
 )
+  ).
+  enablePlugins(JavaAppPackaging).
+  enablePlugins(DockerPlugin).
+  enablePlugins(AshScriptPlugin)
