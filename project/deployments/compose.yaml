@@ -7,7 +7,7 @@ services:
     volumes:
       - C:\data\db:/data/db
   app:
-    image: vishnukantraman/reportgernerationautomation:0.1
+    image: vishnukantraman/reportgernerationautomation:0.2
     volumes:
       - C:\Users\Downloads:/opt/docker/data/
     ports:
