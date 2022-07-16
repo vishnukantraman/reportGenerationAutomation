@@ -59,12 +59,7 @@ lazy val root = project.in(file(".")).
     mainClass in Compile := Some("net.rvk.reportgeneration.services.AkkaHttp"),
     dockerRepository := Some(dockerRepo),
     packageName in Docker := dockerImage,
-    // the function to automatically add an additional tag to the published image
-    dockerAlias := {
-      val tag = dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))
-      val imageName = (packageName in Docker).value
-      DockerAlias(dockerRepository.value, None, imageName, Some(tag))
-    }
+    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, None, (packageName in Docker).value, Some(dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))))
   ).
   enablePlugins(JavaAppPackaging).
   enablePlugins(DockerPlugin).
