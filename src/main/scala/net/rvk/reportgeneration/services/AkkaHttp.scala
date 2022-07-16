@@ -44,19 +44,49 @@ object AkkaHttp {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     val config = ConfigFactory.load()
+//    var testing = config.getBoolean("rr.project.testing")
     val dbname = config.getString("rr.project.dbname")
     val driver = AsyncDriver()
-    val mongoUri = s"mongodb://localhost:27017/db"
+    val mongoUri = if (config.getBoolean("rr.project.insideDocker")) s"mongodb://host.docker.internal:27017/db" else s"mongodb://localhost:27017/db"
     val parsedURI = Future.fromTry(MongoConnection.parseURI(mongoUri))
-    val futureConnection = parsedURI.flatMap(driver.connect(_))
+    val futureConnection = parsedURI.flatMap(driver.connect)
     val failoverStrategy = FailoverStrategy (initialDelay = 3.seconds, retries = 10, delayFactor = attemptNumber => 1 + attemptNumber * 0.5)
     def dbConnection: Future[DefaultDB] = futureConnection.flatMap(_.database(dbname, failoverStrategy))
     def masterDataCollection:Future[BSONCollection] = dbConnection.map(_.collection("masterData"))
     val http = Http(system)
-    lazy val defaultDownloadPath: String = System.getProperty("user.home") + s"\\${config.getString("rr.project.defaultDownloadFolder")}\\"
+    def defaultDownloadPath(testing: Boolean): String = if (testing) s"/opt/docker/data" else System.getProperty("user.home") + s"\\${config.getString("rr.project.defaultDownloadFolder")}\\"
 
     def fetchData(data: MasterData, startDate: String, endDate: String) = {
+      logger.debug(s"config => $data")
       //Fetch token using
+      if (data.testing) Future(List(PaymentDataFlatFileStructure(id= 1,
+        customerUniqueCode= "String",
+        firstName= "test",
+        lastName= "test",
+        customerName= "String",
+        billingUnit= "String",
+        contactNo= "String",
+        dob= "String",
+        age= "String",
+        address= "String",
+        email= "String",
+        cityName="String",
+        stateName= "String",
+        zipcode= "String",
+        aadharNumber= "String",
+        panNumber= "String",
+        receiptNumber= "String",
+        paymentDate= "String",
+        totalAmount= 10.01F,
+        notes= "String",
+        paymentDetailId= 123,
+        item= "String",
+        itemId=Some(1),
+        tax= Some(1F),
+        cost= 10F,
+        qty= 1,
+        itemTotalAmount= 10F,
+        serviceType= "String"))) else
       for {
         HttpResponse(status, _, entity, _) <-  tokenRequest(data)
         _ <- checkStatus(status, entity)
@@ -158,10 +188,10 @@ object AkkaHttp {
       cache.get(tokenRequest)
     }
 
-    def getPath(path: Option[String]) = {
+    def getPath(path: Option[String], tst: Boolean) = {
       path match {
-        case Some(value) => if (new java.io.File(value).exists && value.endsWith("\\")) value else defaultDownloadPath
-        case None => defaultDownloadPath
+        case Some(_) => defaultDownloadPath(tst) //if (new java.io.File(value).exists && value.endsWith("\\")) value else defaultDownloadPath
+        case None => defaultDownloadPath(tst)
       }
     }
 
@@ -176,7 +206,7 @@ object AkkaHttp {
             parameters("startDate".as[String], "endDate".as[String]) { (startDate, endDate) =>
               val future = masterDataCollection.flatMap(_.find(BSONDocument("_id" -> "RRP")).one[MasterData]).flatMap {
                 case Some(masterdata) => fetchData(masterdata, startDate, endDate).map { paymentData =>
-                  val path = getPath(None)
+                  val path = s"/opt/docker/data/" // getPath(None, masterdata.testing)
                   generateCSV(paymentData, startDate, endDate, path)
                   complete(HttpResponse(StatusCodes.OK, entity = s"Your file is downloaded at location - $path"))}
                   .recover { case error: Throwable => complete(HttpResponse(StatusCodes.InternalServerError, entity = s"$error")) }
@@ -191,7 +221,8 @@ object AkkaHttp {
                 val future = masterDataCollection.flatMap(_.find(BSONDocument("_id" -> "RRP")).one[MasterData])
                   .flatMap {
                     case Some(masterdata) => fetchData(masterdata, message.startDate, message.endDate).map { paymentData =>
-                      val path = getPath(message.path)
+                      logger.debug(s"payment data => $paymentData")
+                      val path = s"/opt/docker/data/" //getPath(message.path, masterdata.testing)
                       generateCSV(paymentData, message.startDate, message.endDate, path)
                       complete(HttpResponse(StatusCodes.OK, entity = s"Your file is downloaded at location - $path"))}
                       .recover { case error: Throwable => complete(HttpResponse(StatusCodes.InternalServerError, entity = s"$error"))}
@@ -209,7 +240,7 @@ object AkkaHttp {
 
     dbConnection.onComplete {
       case Success(_) =>
-        Http().bindAndHandle(route, "localhost", 8080)
+        Http().bindAndHandle(route, "0.0.0.0", 8080)
         logger.info(s"Server online at http://localhost:8080/")
       case Failure(exception) => logger.debug("RoboMongo DB connection issue", exception)
     }

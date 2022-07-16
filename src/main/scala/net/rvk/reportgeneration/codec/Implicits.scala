@@ -14,7 +14,8 @@ object MasterDataImplicit {
       baseURL <- doc.getAsTry[String]("baseURL")
       loginPath <- doc.getAsTry[String]("loginPath")
       paymentsPath <- doc.getAsTry[String]("paymentsPath")
-    } yield MasterData(id, userName, password, baseURL, loginPath, paymentsPath)
+      testing <- doc.getAsTry[Boolean]("testing")
+    } yield MasterData(id, userName, password, baseURL, loginPath, paymentsPath, testing)
   }
 }
 
