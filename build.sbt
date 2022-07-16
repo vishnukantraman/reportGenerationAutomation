@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.docker._
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerAlias
 name := "reportGernerationAutomation"
 
 version := "0.1"
@@ -14,6 +15,19 @@ dockerCommands ++= Seq(
 
 val dockerImage = "reportgernerationautomation"
 val dockerRepo = sys.env.getOrElse("REGISTRY_URL", "localhost:5001")
+
+// customizations for the sbt-dynver and docker outputs
+dynverSeparator in ThisBuild := "-"
+//dynverVTagPrefix in ThisBuild := true
+//dynverTagPrefix in ThisBuild := "v"
+
+// a fallback in case something goes terribly wrong with the searchTagFmt
+def fallbackVersion(d: java.util.Date): String = s"HEAD-${sbtdynver.DynVer timestamp d}"
+
+// the tag formatting functions for the image tag we will use to check the existence of an image in the registry for a given commit
+def searchTagFmt(out: sbtdynver.GitDescribeOutput): String = {
+  "commit-" + out.commitSuffix.sha
+}
 
 lazy val root = project.in(file(".")).
   settings(
@@ -44,7 +58,13 @@ lazy val root = project.in(file(".")).
     dockerExposedPorts := Seq(8080, 27017),
     mainClass in Compile := Some("net.rvk.reportgeneration.services.AkkaHttp"),
     dockerRepository := Some(dockerRepo),
-    packageName in Docker := dockerImage
+    packageName in Docker := dockerImage,
+    // the function to automatically add an additional tag to the published image
+    dockerAlias := {
+      val tag = dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))
+      val imageName = (packageName in Docker).value
+      DockerAlias(dockerRepository.value, None, imageName, Some(tag))
+    }
   ).
   enablePlugins(JavaAppPackaging).
   enablePlugins(DockerPlugin).
