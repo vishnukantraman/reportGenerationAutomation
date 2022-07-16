@@ -12,7 +12,7 @@ dockerCommands ++= Seq(
   ExecCmd("RUN", "chmod", "u+x", "/opt/docker/data")
 )
 
-val dockerImage = "repgen"
+val dockerImage = "reportgernerationautomation"
 val dockerRepo = sys.env.getOrElse("REGISTRY_URL", "localhost:5001")
 
 lazy val root = project.in(file(".")).
