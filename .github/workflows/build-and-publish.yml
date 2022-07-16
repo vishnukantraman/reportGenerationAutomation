@@ -20,6 +20,11 @@ jobs:
     env:
       REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Setup Scala
         uses: olafurpg/setup-scala@v10
         with:
@@ -41,8 +46,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image
-        run: |
-          sbt docker:publish
+        run: sbt docker:publish
       - name: Cleanup lock files
         shell: bash
         run: |
