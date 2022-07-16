@@ -1,3 +1,5 @@
+import java.io
+
 import com.typesafe.sbt.packager.docker._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerAlias
 name := "reportGernerationAutomation"
@@ -15,6 +17,7 @@ dockerCommands ++= Seq(
 
 val dockerImage = "reportgernerationautomation"
 val dockerRepo = sys.env.getOrElse("REGISTRY_URL", "localhost:5001")
+val dockerHubUser = sys.env.get("HUB_USERNAME")
 
 // customizations for the sbt-dynver and docker outputs
 dynverSeparator in ThisBuild := "-"
@@ -59,7 +62,7 @@ lazy val root = project.in(file(".")).
     mainClass in Compile := Some("net.rvk.reportgeneration.services.AkkaHttp"),
     dockerRepository := Some(dockerRepo),
     packageName in Docker := dockerImage,
-    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, None, (packageName in Docker).value, Some(dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))))
+    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, dockerHubUser, (packageName in Docker).value, Some(dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))))
   ).
   enablePlugins(JavaAppPackaging).
   enablePlugins(DockerPlugin).
