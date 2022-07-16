@@ -1,4 +1,6 @@
 import java.io
+import java.time.{LocalDateTime, ZoneOffset}
+import java.util.TimeZone
 
 import com.typesafe.sbt.packager.docker._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerAlias
@@ -62,7 +64,8 @@ lazy val root = project.in(file(".")).
     mainClass in Compile := Some("net.rvk.reportgeneration.services.AkkaHttp"),
     dockerRepository := Some(dockerRepo),
     packageName in Docker := dockerImage,
-    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, dockerHubUser, (packageName in Docker).value, Some(dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))))
+//    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, dockerHubUser, (packageName in Docker).value, Some(dynverGitDescribeOutput.value.mkVersion(searchTagFmt, fallbackVersion(dynverCurrentDate.value))))
+    dockerAlias := com.typesafe.sbt.packager.docker.DockerAlias(dockerRepository.value, dockerHubUser, (packageName in Docker).value, Some(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC).toString))
   ).
   enablePlugins(JavaAppPackaging).
   enablePlugins(DockerPlugin).
