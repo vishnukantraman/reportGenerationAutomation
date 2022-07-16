@@ -14,8 +14,8 @@ jobs:
 #          username: ${{ secrets.DOCKERHUB_USERNAME }}
 #          password: ${{ secrets.DOCKERHUB_TOKEN }}
   build:
-    needs:
-    - login
+#    needs:
+#    - login
     runs-on: ubuntu-latest
     env:
       REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
